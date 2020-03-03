@@ -14,6 +14,7 @@ namespace mLab {
     /// Струтуры
     struct txt_replacement;
     struct txt_cycle;
+    struct txt_digit_repl;
     struct text;
     struct _mContainer;
 
@@ -25,17 +26,21 @@ namespace mLab {
     // Шифрует открытый текст в шифротекст
     void cipher(txt_replacement*);
     void cipher(txt_cycle*);
+    void cipher(txt_digit_repl*);
 
     // Возвращает строку, содержащую информацию про текст и шифр
     std::string info_string(txt_replacement*);
     std::string info_string(txt_cycle*);
+    std::string info_string(txt_digit_repl*);
 
     // Считывает с потока строки и преобразовывает их в поля класса
     int read(std::ifstream*, txt_replacement*);
     int read(std::ifstream*, txt_cycle*);
+    int read(std::ifstream*, txt_digit_repl*);
 
     void Init(txt_replacement*);
     void Init(txt_cycle*);
+    void Init(txt_digit_repl*);
     void Init(_mContainer*);
 
     void write_to_file(std::ofstream *_ofstr, _mContainer *);
@@ -47,7 +52,8 @@ namespace mLab {
     /// Перечисление типов текста
     enum txt_type {
         REPLACEMENT = 1,
-        CYCLE = 2
+        CYCLE = 2,
+        DIGIT_REPL = 3
     };
 
     struct txt_replacement {
@@ -64,11 +70,19 @@ namespace mLab {
         std::string *open_txt;
     };
 
+    struct txt_digit_repl{
+        int alphabet_length;
+        std::pair<char, int> *mapping;
+        int *cipher_txt;
+        std::string *open_txt;
+    };
+
     // Класс для объединения текстов
     struct text {
         union {
             txt_replacement r;
             txt_cycle c;
+            txt_digit_repl d;
         };
         txt_type type;
         text *next;

@@ -104,6 +104,24 @@ namespace mLab {
         _t->cipher_txt = res;
     }
 
+
+    void mLab::cipher(txt_digit_repl *_t) {
+        int *res = new int[_t->open_txt->length()];
+        for (int j = 0; j < _t->open_txt->length(); j++) {
+            bool found = false;
+            for(int i = 0; i < _t->alphabet_length; i++) {
+                if(_t->open_txt->at(j) == _t->mapping[i].first) {
+                    res[j] = _t->mapping[i].second;
+                    found = true;
+                }
+            }
+            if(!found) {
+                res[j] = _t->open_txt->at(j);
+            }
+        }
+        _t->cipher_txt = res;
+    }
+
     int read(std::ifstream *_ifstr, txt_replacement *_t) {
         char *s = new char[255];
         int error_code = 0;
@@ -209,6 +227,97 @@ namespace mLab {
         return error_code;
     }
 
+
+    int mLab::read(std::ifstream *_ifstr, txt_digit_repl *_t) {
+        char *s = new char[255];
+        int error_code = 0;
+        std::string str, temp_str;
+        std::string _open_text;
+        int step = 0;
+        int index = 0;
+        int result = 0;
+        char *m_first = nullptr;
+        std::pair<char, int> *mapping = nullptr;
+        while (!_ifstr->eof() && error_code == 0 && step < 6) {
+            _ifstr->getline(s, 255);
+            str = s;
+            if (s[0] == '/' && s[1] == '/') continue;
+            switch (step) {
+                case 0:
+                    if (str == ">text") step++;
+                    else error_code = 1;
+                    break;
+                case 1:
+                    _open_text = str;
+                    step++;
+                    break;
+                case 2:
+                    if (str == ">replace") step++;
+                    else error_code = 2;
+                    break;
+                case 3:
+                    _t->alphabet_length = (str.length()+1)/2;
+                    index = 0;
+                    m_first = new char[_t->alphabet_length];
+                    for (int i = 0; i < _t->alphabet_length; i++) {
+                        m_first[i] = str[index];
+                        if(i > 0 && str[index-1] != ',') {
+                            error_code = 13;
+                            break;
+                        }
+                        index+=2;
+                    }
+                    step++;
+                    break;
+                case 4:
+                    if (str == ">with") step++;
+                    else error_code = 3;
+                    break;
+                case 5:
+                    mapping = new std::pair<char, int>[_t->alphabet_length];
+                    index = 0;
+                    while(str.find(',')) {
+                        temp_str = str.substr(0, str.find(','));
+                        result = from_str_to_int(temp_str);
+                        if(result < 0) {
+                            error_code = 13;
+                            break;
+                        }
+                        mapping[index].first = m_first[index];
+                        mapping[index].second = result;
+                        if(str.length() > str.find(','))
+                            str = str.substr(str.find(',')+1);
+                        else break;
+                        index++;
+                    }
+                    if(str.length() > 0) {
+                        result = from_str_to_int(temp_str);
+                        if(result < 0) {
+                            error_code = 13;
+                            break;
+                        }
+                        mapping[index].first = m_first[index];
+                        mapping[index].second = result;
+                    }
+                    delete[] m_first;
+                    m_first = NULL;
+                    _t->open_txt = new std::string;
+                    _t->open_txt->append(_open_text);
+                    _t->mapping = mapping;
+                    step++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (m_first) {
+            delete[] m_first;
+        }
+        if (s) delete[] s;
+        if (error_code && mapping) delete[] mapping;
+        return error_code;
+    }
+
     void Init(txt_replacement*_t) {
         _t->alphabet_length = 0;
         _t->mapping = nullptr;
@@ -218,6 +327,12 @@ namespace mLab {
 
     void Init(txt_cycle*_t) {
         _t->shift = 0;
+        _t->cipher_txt = nullptr;
+        _t->open_txt = nullptr;
+    }
+
+    void mLab::Init(txt_digit_repl *_t) {
+        _t->mapping = nullptr;
         _t->cipher_txt = nullptr;
         _t->open_txt = nullptr;
     }
@@ -243,6 +358,7 @@ namespace mLab {
         res += "\n";
         return res;
     }
+
     std::string info_string(txt_cycle *_t) {
         std::string res = "Cipher type: symbol cycle\n";
         res += "Open_text:\n";
@@ -262,6 +378,45 @@ namespace mLab {
         return res;
     }
 
+    std::string int_to_str(int ask) {
+        std::string res = "";
+        if(ask == 0) return "0";
+        while(ask) {
+            res = char(ask % 10 + 48) + res;
+            ask /= 10;
+        }
+        return res;
+    }
+
+    std::string mLab::info_string(txt_digit_repl *_t) {
+        std::string res = "Cipher type: digit replacement\n";
+        res += "Open_text:\n";
+        res += *_t->open_txt;
+        res += "\nReplace:\n";
+        std::string temp = "";
+        for(int i = 0; i < _t->alphabet_length; i++) {
+            res += _t->mapping[i].first;
+            int result = _t->mapping[i].second;
+            temp += int_to_str(result);
+            if(i + 1 != _t->alphabet_length) {
+                res += ',';
+                temp += ',';
+            }
+        }
+        res += "\nWith:\n";
+        res += temp;
+        res += "\nCipher text:\n";
+        std::string ciph;
+        if(!_t->cipher_txt)
+            cipher(_t);
+        for(int i = 0; i < _t->open_txt->length(); i++) {
+            ciph += int_to_str(_t->cipher_txt[i]);
+            ciph += ' ';
+        }
+        res += ciph;
+        res += "\n";
+        return res;
+    }
 
     /// Returns error_code:
     /// 0 - no error has occurred
@@ -293,6 +448,7 @@ namespace mLab {
                 if (str.substr(0, 6) == ">type ") {
                     if (str[6] == '1') type = txt_type::REPLACEMENT;
                     else if (str[6] == '2') type = txt_type::CYCLE;
+                    else if (str[6] == '3') type = txt_type::DIGIT_REPL;
                     else {
                         error_code = 6;
                         break;
@@ -312,6 +468,10 @@ namespace mLab {
                     case txt_type::CYCLE:
                         Init(&txt->c);
                         error_code = read(_ifstr, &txt->c);
+                        break;
+                    case txt_type::DIGIT_REPL:
+                        Init(&txt->d);
+                        error_code = read(_ifstr, &txt->d);
                         break;
                 }
 
@@ -336,6 +496,9 @@ namespace mLab {
                         break;
                     case txt_type::CYCLE:
                         out_str += info_string(&i->c);
+                        break;
+                    case txt_type::DIGIT_REPL:
+                        out_str += info_string(&i->d);
                         break;
                 }
                 out_str += "----------------\n";
