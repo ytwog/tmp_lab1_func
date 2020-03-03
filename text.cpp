@@ -112,7 +112,7 @@ namespace mLab {
         int step = 0;
         char *m_first = nullptr;
         std::pair<char, char> *mapping = nullptr;
-        while (!_ifstr->eof() && error_code == 0 && step < 6) {
+        while (!_ifstr->eof() && error_code == 0 && step < 8) {
             _ifstr->getline(s, 255);
             str = s;
             if (s[0] == '/' && s[1] == '/') continue;
@@ -158,6 +158,15 @@ namespace mLab {
                     _t->mapping = mapping;
                     step++;
                     break;
+                case 6:
+                    if (str == ">owner info") step++;
+                    else error_code = 13;
+                    break;
+                case 7:
+                    _t->owner_info = new std::string;
+                    _t->owner_info->append(str);
+                    step++;
+                    break;
                 default:
                     break;
             }
@@ -178,7 +187,7 @@ namespace mLab {
         std::string _open_text;
         int step = 0;
         int _shift = 0;
-        while(!_ifstr->eof() && error_code == 0 && step < 3) {
+        while(!_ifstr->eof() && error_code == 0 && step < 5) {
             _ifstr->getline(s, 255);
             str = s;
             if (s[0] == '/' && s[1] == '/') continue;
@@ -199,6 +208,15 @@ namespace mLab {
                     _t->open_txt = new std::string;
                     _t->open_txt->append(_open_text);
                     _t->shift = _shift;
+                    step++;
+                    break;
+                case 3:
+                    if (str == ">owner info") step++;
+                    else error_code = 13;
+                    break;
+                case 4:
+                    _t->owner_info = new std::string;
+                    _t->owner_info->append(str);
                     step++;
                     break;
                 default:
@@ -240,6 +258,8 @@ namespace mLab {
             cipher(_t);
         ciph = *_t->cipher_txt;
         res += ciph;
+        res += "\nOwner info:\n";
+        res += *(_t->owner_info);
         res += "\n";
         return res;
     }
@@ -258,6 +278,8 @@ namespace mLab {
             cipher(_t);
         ciph = *_t->cipher_txt;
         res += ciph;
+        res += "\nOwner info:\n";
+        res += *(_t->owner_info);
         res += "\n";
         return res;
     }

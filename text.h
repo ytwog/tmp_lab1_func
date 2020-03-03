@@ -55,6 +55,7 @@ namespace mLab {
         std::pair<char, char> *mapping;
         std::string *cipher_txt;
         std::string *open_txt;
+        std::string *owner_info;
     };
 
     // Класс текста со сдвигом
@@ -62,6 +63,7 @@ namespace mLab {
         int shift;
         std::string *cipher_txt;
         std::string *open_txt;
+        std::string *owner_info;
     };
 
     // Класс для объединения текстов
