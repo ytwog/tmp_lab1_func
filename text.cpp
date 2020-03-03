@@ -444,7 +444,7 @@ namespace mLab {
 
     void sort(_mContainer *cont) {
         for(text* i = cont->start; i != cont->end; i = i->next) {
-            for(text* j = cont->start->next; j->next != cont->start; j = j->next) {
+            for(text* j = i->next; j != cont->start; j = j->next) {
                 if(comparat(i, j)) {
                     auto q = i->u;
                     i->u = j->u;

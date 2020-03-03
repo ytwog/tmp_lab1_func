@@ -10,18 +10,6 @@ GODGDOGGOGD
 OpenText length:
 11
 ----------------
-Cipher type: symbol replacement
-Open_text:
-SOME RANDOM text 
-Replace:
-ABCDEFGHIJKLMNOPQRSTUtext
-With:
-DGFJASKFNJCOWPJIWBUWBqwez
-Cipher text:
-UJWA BDPJJW zwez 
-OpenText length:
-17
-----------------
 Cipher type: symbol cycle
 Open_text:
 TEXT SAFASF TEXT AWEPO D
@@ -43,14 +31,17 @@ KDJfDCSDUSCDOSSDUC SD UCS O
 OpenText length:
 27
 ----------------
-Cipher type: symbol cycle
+Cipher type: symbol replacement
 Open_text:
-OPEN text FOR ENTRY 2 ABLABBALAB
-Shift: 11
+SOME RANDOM text 
+Replace:
+ABCDEFGHIJKLMNOPQRSTUtext
+With:
+DGFJASKFNJCOWPJIWBUWBqwez
 Cipher text:
-ZAPY epie QZC PYECJ 2 LMWLMMLWLM
+UJWA BDPJJW zwez 
 OpenText length:
-32
+17
 ----------------
 Cipher type: symbol cycle
 Open_text:
@@ -60,4 +51,13 @@ Cipher text:
 QRGP VGZV HQT GPVTA 1 YKVJ EAENG UJKHV
 OpenText length:
 38
+----------------
+Cipher type: symbol cycle
+Open_text:
+OPEN text FOR ENTRY 2 ABLABBALAB
+Shift: 11
+Cipher text:
+ZAPY epie QZC PYECJ 2 LMWLMMLWLM
+OpenText length:
+32
 ----------------
