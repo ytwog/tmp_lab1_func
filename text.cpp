@@ -215,8 +215,6 @@ namespace mLab {
         }
     }
 
-    /// Методы txt_cycle
-
     std::string info_string(text *_t) {
         if(_t->type == txt_type::REPLACEMENT) {
             std::string res = "Cipher type: symbol replacement\n";
