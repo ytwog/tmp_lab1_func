@@ -222,6 +222,16 @@ namespace mLab {
         _t->open_txt = nullptr;
     }
 
+    std::string int_to_str(int ask) {
+        std::string res = "";
+        if(ask == 0) return "0";
+        while(ask) {
+            res = char(ask % 10 + 48) + res;
+            ask /= 10;
+        }
+        return res;
+    }
+
     std::string info_string(txt_replacement *_t) {
         std::string res = "Cipher type: symbol replacement\n";
         res += "Open_text:\n";
@@ -240,9 +250,12 @@ namespace mLab {
             cipher(_t);
         ciph = *_t->cipher_txt;
         res += ciph;
+        res += "\nOpenText length:\n";
+        res += int_to_str(counter_function(_t));
         res += "\n";
         return res;
     }
+
     std::string info_string(txt_cycle *_t) {
         std::string res = "Cipher type: symbol cycle\n";
         res += "Open_text:\n";
@@ -258,6 +271,8 @@ namespace mLab {
             cipher(_t);
         ciph = *_t->cipher_txt;
         res += ciph;
+        res += "\nOpenText length:\n";
+        res += int_to_str(counter_function(_t));
         res += "\n";
         return res;
     }
@@ -386,6 +401,15 @@ namespace mLab {
 
     void mLab::Init(_mContainer *_c) {
         _c->end = _c->start = NULL;
+    }
+
+    int counter_function(txt_replacement *_t) {
+        return _t->open_txt->length();
+    }
+
+
+    int counter_function(txt_cycle *_t) {
+        return _t->open_txt->length();
     }
 
 }

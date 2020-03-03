@@ -26,6 +26,9 @@ namespace mLab {
     void cipher(txt_replacement*);
     void cipher(txt_cycle*);
 
+    int counter_function(txt_replacement*);
+    int counter_function(txt_cycle*);
+
     // Возвращает строку, содержащую информацию про текст и шифр
     std::string info_string(txt_replacement*);
     std::string info_string(txt_cycle*);
