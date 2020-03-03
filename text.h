@@ -72,16 +72,20 @@ namespace mLab {
         union {
             txt_replacement r;
             txt_cycle c;
-        };
+        } u;
         txt_type type;
         text *next;
     };
+
+    bool comparat(text _f, text _s);
 
     // Контейнер - однонаправленный цикличный список
     struct _mContainer {
         text *start;
         text *end;
     };
+
+    void sort(_mContainer* cont);
 
 }
 #endif //LAB1_TEXT_H

@@ -321,12 +321,12 @@ namespace mLab {
                 txt->next = NULL;
                 switch(txt->type) {
                     case txt_type::REPLACEMENT:
-                        Init(&txt->r);
-                        error_code = read(_ifstr, &txt->r);
+                        Init(&txt->u.r);
+                        error_code = read(_ifstr, &txt->u.r);
                         break;
                     case txt_type::CYCLE:
-                        Init(&txt->c);
-                        error_code = read(_ifstr, &txt->c);
+                        Init(&txt->u.c);
+                        error_code = read(_ifstr, &txt->u.c);
                         break;
                 }
 
@@ -343,14 +343,15 @@ namespace mLab {
 
     void write_to_file(std::ofstream *_ofstr, _mContainer*_c) {
         std::string out_str = "";
+        sort(_c);
         if(_c->start) {
             for (text *i = _c->start; ; i = i->next) {
                 switch(i->type) {
                     case txt_type::REPLACEMENT:
-                        out_str += info_string(&i->r);
+                        out_str += info_string(&i->u.r);
                         break;
                     case txt_type::CYCLE:
-                        out_str += info_string(&i->c);
+                        out_str += info_string(&i->u.c);
                         break;
                 }
                 out_str += "----------------\n";
@@ -377,7 +378,7 @@ namespace mLab {
             if(i == _node) {
                 prev->next = i->next;
                 if(i->type == txt_type::REPLACEMENT) {
-                    if(i->r.mapping) delete[] i->r.mapping;
+                    if(i->u.r.mapping) delete[] i->u.r.mapping;
                 }
                 delete i;
                 return true;
@@ -410,6 +411,50 @@ namespace mLab {
 
     int counter_function(txt_cycle *_t) {
         return _t->open_txt->length();
+    }
+
+    bool comparat(text *_f, text *_s) {
+        int l1 = 0, l2 = 0;
+        switch (_f->type) {
+            case txt_type::CYCLE:
+                l1 = counter_function(&_f->u.c);
+                break;
+            case txt_type::REPLACEMENT:
+                l1 = counter_function(&_f->u.r);
+                break;
+            default:
+                break;
+        }
+
+        switch (_s->type) {
+            case txt_type::CYCLE:
+                l2 = counter_function(&_s->u.c);
+                break;
+            case txt_type::REPLACEMENT:
+                l2 = counter_function(&_s->u.r);
+                break;
+            default:
+                break;
+        }
+        if(l1 > l2)
+            std::cout << l1 << ">" << l2 << std::endl;
+        else std::cout << l1 << "<=" << l2 << std::endl;
+        return l1 > l2;
+    }
+
+    void sort(_mContainer *cont) {
+        for(text* i = cont->start; i != cont->end; i = i->next) {
+            for(text* j = cont->start->next; j->next != cont->start; j = j->next) {
+                if(comparat(i, j)) {
+                    auto q = i->u;
+                    i->u = j->u;
+                    j->u = q;
+                    txt_type w = i->type;
+                    i->type = j->type;
+                    j->type = w;
+                }
+            }
+        }
     }
 
 }

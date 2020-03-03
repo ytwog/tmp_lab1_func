@@ -12,12 +12,12 @@ OpenText length:
 ----------------
 Cipher type: symbol cycle
 Open_text:
-TEXT SAFASF TEXT AWEPO D
-Shift: 18
+OPEN TEXT FOR ENTRY 1 WITH CYCLE SHIFT
+Shift: 2
 Cipher text:
-LWPL KSXSKX LWPL SOWHG V
+QRGP VGZV HQT GPVTA 1 YKVJ EAENG UJKHV
 OpenText length:
-24
+38
 ----------------
 Cipher type: symbol replacement
 Open_text:
@@ -31,6 +31,15 @@ KDJfDCSDUSCDOSSDUC SD UCS O
 OpenText length:
 27
 ----------------
+Cipher type: symbol cycle
+Open_text:
+TEXT SAFASF TEXT AWEPO D
+Shift: 18
+Cipher text:
+LWPL KSXSKX LWPL SOWHG V
+OpenText length:
+24
+----------------
 Cipher type: symbol replacement
 Open_text:
 SOME RANDOM text 
@@ -42,15 +51,6 @@ Cipher text:
 UJWA BDPJJW zwez 
 OpenText length:
 17
-----------------
-Cipher type: symbol cycle
-Open_text:
-OPEN TEXT FOR ENTRY 1 WITH CYCLE SHIFT
-Shift: 2
-Cipher text:
-QRGP VGZV HQT GPVTA 1 YKVJ EAENG UJKHV
-OpenText length:
-38
 ----------------
 Cipher type: symbol cycle
 Open_text:
