@@ -23,19 +23,24 @@ namespace mLab {
     // Класс текста с заменами
 
     // Шифрует открытый текст в шифротекст
-    void cipher(text*);
+    void cipher(txt_replacement*);
+    void cipher(txt_cycle*);
 
     // Возвращает строку, содержащую информацию про текст и шифр
-    std::string info_string(text*);
+    std::string info_string(txt_replacement*);
+    std::string info_string(txt_cycle*);
 
     // Считывает с потока строки и преобразовывает их в поля класса
-    int read(std::ifstream*, text*);
+    int read(std::ifstream*, txt_replacement*);
+    int read(std::ifstream*, txt_cycle*);
 
-    void Init(text*);
+    void Init(txt_replacement*);
+    void Init(txt_cycle*);
     void Init(_mContainer*);
 
     void write_to_file(std::ofstream *_ofstr, _mContainer *);
     int read_from_file(std::ifstream *_ifstr, _mContainer *);
+
     text *text_at(int pos, _mContainer *);
     bool remove(text *_node, _mContainer*);
     void append(text *_node, _mContainer*);
@@ -44,7 +49,6 @@ namespace mLab {
         REPLACEMENT = 1,
         CYCLE = 2
     };
-
 
     struct txt_replacement {
         int alphabet_length;

@@ -70,190 +70,196 @@ namespace mLab {
     }
 
 
-    void cipher(text*_t) {
+    void cipher(txt_replacement* _t) {
         std::string *res = new std::string;
-        if (_t->type == txt_type::REPLACEMENT) {
-            *res = *_t->r.open_txt;
-            for (int i = 0; i < _t->r.alphabet_length; i++) {
-                int temp = 0;
-                int pos = 0;
-                while (temp != -1 && pos < _t->r.open_txt->length() && !_t->r.open_txt->substr(pos).empty()) {
-                    temp = _t->r.open_txt->substr(pos).find(_t->r.mapping[i].first);
-                    if (temp == -1) break;
-                    char q = _t->r.mapping[i].first;
-                    char w = _t->r.mapping[i].second;
+        *res = *_t->open_txt;
+        for (int i = 0; i < _t->alphabet_length; i++) {
+            int temp = 0;
+            int pos = 0;
+            while (temp != -1 && pos < _t->open_txt->length() && !_t->open_txt->substr(pos).empty()) {
+                temp = _t->open_txt->substr(pos).find(_t->mapping[i].first);
+                if (temp == -1) break;
+                char q = _t->mapping[i].first;
+                char w = _t->mapping[i].second;
 
-                    (*res)[temp + pos] = _t->r.mapping[i].second;
-                    pos += temp + 1;
-                }
+                (*res)[temp + pos] = _t->mapping[i].second;
+                pos += temp + 1;
             }
-            _t->r.cipher_txt = res;
-        } else {
-            *res = *_t->c.open_txt;
-            int _shift = _t->c.shift % 26;
-            for(int i = 0; i < res->length(); i++) {
-                bool upper_case = ((*res)[i] >= 'A' && (*res)[i] <= 'Z');
-                if(((*res)[i] >= 'a' && (*res)[i] <= 'z') || ((*res)[i] >= 'A' && (*res)[i] <= 'Z')) {
-                    (*res)[i] += _t->c.shift;
-                    if((((*res)[i] < 'a' || (*res)[i] > 'z') && !upper_case)
-                       || (((*res)[i] < 'A' || (*res)[i] > 'Z') && upper_case))
-                        (*res)[i] -= 26;
-                }
-            }
-            _t->c.cipher_txt = res;
         }
+        _t->cipher_txt = res;
+    }
+    void cipher(txt_cycle* _t) {
+        std::string *res = new std::string;
+        *res = *_t->open_txt;
+        int _shift = _t->shift % 26;
+        for(int i = 0; i < res->length(); i++) {
+            bool upper_case = ((*res)[i] >= 'A' && (*res)[i] <= 'Z');
+            if(((*res)[i] >= 'a' && (*res)[i] <= 'z') || ((*res)[i] >= 'A' && (*res)[i] <= 'Z')) {
+                (*res)[i] += _t->shift;
+                if((((*res)[i] < 'a' || (*res)[i] > 'z') && !upper_case)
+                   || (((*res)[i] < 'A' || (*res)[i] > 'Z') && upper_case))
+                    (*res)[i] -= 26;
+            }
+        }
+        _t->cipher_txt = res;
     }
 
-    int read(std::ifstream *_ifstr, text *_t) {
+    int read(std::ifstream *_ifstr, txt_replacement *_t) {
         char *s = new char[255];
         int error_code = 0;
         std::string str;
         std::string _open_text;
         int step = 0;
-        if(_t->type == txt_type::REPLACEMENT) {
-            char *m_first = nullptr;
-            std::pair <char, char> *mapping = nullptr;
-            while(!_ifstr->eof() && error_code == 0 && step < 6) {
-                _ifstr->getline(s, 255);
-                str = s;
-                if (s[0] == '/' && s[1] == '/') continue;
-                switch (step) {
-                    case 0:
-                        if (str == ">text") step++;
-                        else error_code = 1;
+        char *m_first = nullptr;
+        std::pair<char, char> *mapping = nullptr;
+        while (!_ifstr->eof() && error_code == 0 && step < 6) {
+            _ifstr->getline(s, 255);
+            str = s;
+            if (s[0] == '/' && s[1] == '/') continue;
+            switch (step) {
+                case 0:
+                    if (str == ">text") step++;
+                    else error_code = 1;
+                    break;
+                case 1:
+                    _open_text = str;
+                    step++;
+                    break;
+                case 2:
+                    if (str == ">replace") step++;
+                    else error_code = 2;
+                    break;
+                case 3:
+                    _t->alphabet_length = str.length();
+                    m_first = new char[_t->alphabet_length];
+                    for (int i = 0; i < _t->alphabet_length; i++) {
+                        m_first[i] = str[i];
+                    }
+                    step++;
+                    break;
+                case 4:
+                    if (str == ">with") step++;
+                    else error_code = 3;
+                    break;
+                case 5:
+                    if (str.length() != _t->alphabet_length) {
+                        error_code = 4;
                         break;
-                    case 1:
-                        _open_text = str;
-                        step++;
-                        break;
-                    case 2:
-                        if (str == ">replace") step++;
-                        else error_code = 2;
-                        break;
-                    case 3:
-                        _t->r.alphabet_length = str.length();
-                        m_first = new char[_t->r.alphabet_length];
-                        for (int i = 0; i < _t->r.alphabet_length; i++) {
-                            m_first[i] = str[i];
-                        }
-                        step++;
-                        break;
-                    case 4:
-                        if (str == ">with") step++;
-                        else error_code = 3;
-                        break;
-                    case 5:
-                        if (str.length() != _t->r.alphabet_length) {
-                            error_code = 4;
-                            break;
-                        };
-                        mapping = new std::pair<char, char>[_t->r.alphabet_length];
-                        for (int i = 0; i < _t->r.alphabet_length; i++) {
-                            mapping[i].first = m_first[i];
-                            mapping[i].second = str[i];
-                        }
-                        delete[] m_first;
-                        m_first = NULL;
-                        _t->r.open_txt = new std::string;
-                        _t->r.open_txt->append(_open_text);
-                        _t->r.mapping = mapping;
-                        step++;
-                        break;
-                    default:
-                        break;
-                }
+                    };
+                    mapping = new std::pair<char, char>[_t->alphabet_length];
+                    for (int i = 0; i < _t->alphabet_length; i++) {
+                        mapping[i].first = m_first[i];
+                        mapping[i].second = str[i];
+                    }
+                    delete[] m_first;
+                    m_first = NULL;
+                    _t->open_txt = new std::string;
+                    _t->open_txt->append(_open_text);
+                    _t->mapping = mapping;
+                    step++;
+                    break;
+                default:
+                    break;
             }
-            if(m_first) {
-                delete[] m_first;
-            }
-            if(s) delete[] s;
-            if(error_code && mapping) delete[] mapping;
-        } else { // При type == CYCLE
-            int _shift = 0;
-            while(!_ifstr->eof() && error_code == 0 && step < 3) {
-                _ifstr->getline(s, 255);
-                str = s;
-                if (s[0] == '/' && s[1] == '/') continue;
-                switch (step) {
-                    case 0:
-                        if (str == ">text") step++;
-                        else error_code = 1;
-                        break;
-                    case 1:
-                        _open_text = str;
-                        step++;
-                        break;
-                    case 2:
-                        if (str.substr(0, 7) != ">shift ") error_code = 10;
-                        _shift = from_str_to_int(str.substr(7));
-                        if(_shift == -1) return 11;
-                        if(_shift == -2) return 12;
-                        _t->c.open_txt = new std::string;
-                        _t->c.open_txt->append(_open_text);
-                        _t->c.shift = _shift;
-                        step++;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if(s) delete[] s;
         }
+        if (m_first) {
+            delete[] m_first;
+        }
+        if (s) delete[] s;
+        if (error_code && mapping) delete[] mapping;
         return error_code;
     }
 
-    void Init(text*_t) {
-        if(_t->type == txt_type::REPLACEMENT) {
-            _t->r.alphabet_length = 0;
-            _t->r.mapping = nullptr;
-            _t->r.cipher_txt = nullptr;
-            _t->r.open_txt = nullptr;
-        } else {
-            _t->c.shift = 0;
-            _t->c.cipher_txt = nullptr;
-            _t->c.open_txt = nullptr;
+
+    int read(std::ifstream *_ifstr, txt_cycle *_t) {
+        char *s = new char[255];
+        int error_code = 0;
+        std::string str;
+        std::string _open_text;
+        int step = 0;
+        int _shift = 0;
+        while(!_ifstr->eof() && error_code == 0 && step < 3) {
+            _ifstr->getline(s, 255);
+            str = s;
+            if (s[0] == '/' && s[1] == '/') continue;
+            switch (step) {
+                case 0:
+                    if (str == ">text") step++;
+                    else error_code = 1;
+                    break;
+                case 1:
+                    _open_text = str;
+                    step++;
+                    break;
+                case 2:
+                    if (str.substr(0, 7) != ">shift ") error_code = 10;
+                    _shift = from_str_to_int(str.substr(7));
+                    if(_shift == -1) return 11;
+                    if(_shift == -2) return 12;
+                    _t->open_txt = new std::string;
+                    _t->open_txt->append(_open_text);
+                    _t->shift = _shift;
+                    step++;
+                    break;
+                default:
+                    break;
+            }
         }
+        if(s) delete[] s;
+        return error_code;
     }
 
-    std::string info_string(text *_t) {
-        if(_t->type == txt_type::REPLACEMENT) {
-            std::string res = "Cipher type: symbol replacement\n";
-            res += "Open_text:\n";
-            res += *_t->r.open_txt;
-            res += "\nReplace:\n";
-            std::string temp = "";
-            for(int i = 0; i < _t->r.alphabet_length; i++) {
-                res += _t->r.mapping[i].first;
-                temp += _t->r.mapping[i].second;
-            }
-            res += "\nWith:\n";
-            res += temp;
-            res += "\nCipher text:\n";
-            std::string ciph;
-            if(!_t->r.cipher_txt)
-                cipher(_t);
-            ciph = *_t->r.cipher_txt;
-            res += ciph;
-            res += "\n";
-            return res;
-        } else {
-            std::string res = "Cipher type: symbol cycle\n";
-            res += "Open_text:\n";
-            res += *_t->c.open_txt;
-            res += "\nShift: ";
-            int _shift = _t->c.shift;
-            char *temp_shift = new char[16];
-            _itoa_s(_shift, temp_shift, 10, 10);
-            res += temp_shift;
-            res += "\nCipher text:\n";
-            std::string ciph;
-            if(!_t->c.cipher_txt)
-                cipher(_t);
-            ciph = *_t->c.cipher_txt;
-            res += ciph;
-            res += "\n";
-            return res;
+    void Init(txt_replacement*_t) {
+        _t->alphabet_length = 0;
+        _t->mapping = nullptr;
+        _t->cipher_txt = nullptr;
+        _t->open_txt = nullptr;
+    }
+
+    void Init(txt_cycle*_t) {
+        _t->shift = 0;
+        _t->cipher_txt = nullptr;
+        _t->open_txt = nullptr;
+    }
+
+    std::string info_string(txt_replacement *_t) {
+        std::string res = "Cipher type: symbol replacement\n";
+        res += "Open_text:\n";
+        res += *_t->open_txt;
+        res += "\nReplace:\n";
+        std::string temp = "";
+        for(int i = 0; i < _t->alphabet_length; i++) {
+            res += _t->mapping[i].first;
+            temp += _t->mapping[i].second;
         }
+        res += "\nWith:\n";
+        res += temp;
+        res += "\nCipher text:\n";
+        std::string ciph;
+        if(!_t->cipher_txt)
+            cipher(_t);
+        ciph = *_t->cipher_txt;
+        res += ciph;
+        res += "\n";
+        return res;
+    }
+    std::string info_string(txt_cycle *_t) {
+        std::string res = "Cipher type: symbol cycle\n";
+        res += "Open_text:\n";
+        res += *_t->open_txt;
+        res += "\nShift: ";
+        int _shift = _t->shift;
+        char *temp_shift = new char[16];
+        _itoa_s(_shift, temp_shift, 10, 10);
+        res += temp_shift;
+        res += "\nCipher text:\n";
+        std::string ciph;
+        if(!_t->cipher_txt)
+            cipher(_t);
+        ciph = *_t->cipher_txt;
+        res += ciph;
+        res += "\n";
+        return res;
     }
 
 
@@ -297,10 +303,18 @@ namespace mLab {
                 }
                 text *txt = new text;
                 txt->type = (txt_type) type;
-                Init(txt);
                 txt->next = NULL;
+                switch(txt->type) {
+                    case txt_type::REPLACEMENT:
+                        Init(&txt->r);
+                        error_code = read(_ifstr, &txt->r);
+                        break;
+                    case txt_type::CYCLE:
+                        Init(&txt->c);
+                        error_code = read(_ifstr, &txt->c);
+                        break;
+                }
 
-                error_code = read(_ifstr, txt);
                 if (!error_code) append(txt, _c);
                 else delete txt;
                 operation = -1;
@@ -316,7 +330,14 @@ namespace mLab {
         std::string out_str = "";
         if(_c->start) {
             for (text *i = _c->start; ; i = i->next) {
-                out_str += info_string(i);
+                switch(i->type) {
+                    case txt_type::REPLACEMENT:
+                        out_str += info_string(&i->r);
+                        break;
+                    case txt_type::CYCLE:
+                        out_str += info_string(&i->c);
+                        break;
+                }
                 out_str += "----------------\n";
                 if(i == _c->end) break;
             }
