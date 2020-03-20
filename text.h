@@ -11,6 +11,12 @@
 #include <Windows.h>
 
 namespace mLab {
+    enum txt_type {
+        REPLACEMENT = 1,
+        CYCLE = 2,
+        DIGIT_REPL = 3
+    };
+
     /// Струтуры
     struct txt_replacement;
     struct txt_cycle;
@@ -43,18 +49,12 @@ namespace mLab {
     void Init(txt_digit_repl*);
     void Init(_mContainer*);
 
-    void write_to_file(std::ofstream *_ofstr, _mContainer *);
+    void write_to_file(std::ofstream *_ofstr, _mContainer *, int ignore_type = 0);
     int read_from_file(std::ifstream *_ifstr, _mContainer *);
 
     text *text_at(int pos, _mContainer *);
     bool remove(text *_node, _mContainer*);
     void append(text *_node, _mContainer*);
-    /// Перечисление типов текста
-    enum txt_type {
-        REPLACEMENT = 1,
-        CYCLE = 2,
-        DIGIT_REPL = 3
-    };
 
     struct txt_replacement {
         int alphabet_length;
@@ -93,6 +93,7 @@ namespace mLab {
 
     // Контейнер - однонаправленный цикличный список
     struct _mContainer {
+        int ignore = -1;
         text *start;
         text *end;
     };
