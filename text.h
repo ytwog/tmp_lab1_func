@@ -34,6 +34,10 @@ namespace mLab {
     void cipher(txt_cycle*);
     void cipher(txt_digit_repl*);
 
+    int counter_function(txt_replacement*);
+    int counter_function(txt_cycle*);
+    int counter_function(txt_digit_repl*);
+
     // Возвращает строку, содержащую информацию про текст и шифр
     std::string info_string(txt_replacement*);
     std::string info_string(txt_cycle*);
@@ -86,10 +90,12 @@ namespace mLab {
             txt_replacement r;
             txt_cycle c;
             txt_digit_repl d;
-        };
+        } u;
         txt_type type;
         text *next;
     };
+
+    bool comparat(text _f, text _s);
 
     // Контейнер - однонаправленный цикличный список
     struct _mContainer {
@@ -97,6 +103,8 @@ namespace mLab {
         text *start;
         text *end;
     };
+
+    void sort(_mContainer* cont);
 
 }
 #endif //LAB1_TEXT_H

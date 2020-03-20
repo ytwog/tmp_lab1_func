@@ -364,6 +364,16 @@ namespace mLab {
         _t->open_txt = nullptr;
     }
 
+    std::string int_to_str(int ask) {
+        std::string res = "";
+        if(ask == 0) return "0";
+        while(ask) {
+            res = char(ask % 10 + 48) + res;
+            ask /= 10;
+        }
+        return res;
+    }
+
     std::string info_string(txt_replacement *_t) {
         std::string res = "Cipher type: symbol replacement\n";
         res += "Open_text:\n";
@@ -384,6 +394,8 @@ namespace mLab {
         res += ciph;
         res += "\nOwner info:\n";
         res += *(_t->owner_info);
+        res += "\nOpenText length:\n";
+        res += int_to_str(counter_function(_t));
         res += "\n";
         return res;
     }
@@ -405,17 +417,9 @@ namespace mLab {
         res += ciph;
         res += "\nOwner info:\n";
         res += *(_t->owner_info);
+        res += "\nOpenText length:\n";
+        res += int_to_str(counter_function(_t));
         res += "\n";
-        return res;
-    }
-
-    std::string int_to_str(int ask) {
-        std::string res = "";
-        if(ask == 0) return "0";
-        while(ask) {
-            res = char(ask % 10 + 48) + res;
-            ask /= 10;
-        }
         return res;
     }
 
@@ -445,6 +449,8 @@ namespace mLab {
             ciph += ' ';
         }
         res += ciph;
+        res += "\nOpenText length:\n";
+        res += int_to_str(counter_function(_t));
         res += "\n";
         return res;
     }
@@ -503,16 +509,16 @@ namespace mLab {
                 txt->next = NULL;
                 switch(txt->type) {
                     case txt_type::REPLACEMENT:
-                        Init(&txt->r);
-                        error_code = read(_ifstr, &txt->r);
+                        Init(&txt->u.r);
+                        error_code = read(_ifstr, &txt->u.r);
                         break;
                     case txt_type::CYCLE:
-                        Init(&txt->c);
-                        error_code = read(_ifstr, &txt->c);
+                        Init(&txt->u.c);
+                        error_code = read(_ifstr, &txt->u.c);
                         break;
                     case txt_type::DIGIT_REPL:
-                        Init(&txt->d);
-                        error_code = read(_ifstr, &txt->d);
+                        Init(&txt->u.d);
+                        error_code = read(_ifstr, &txt->u.d);
                         break;
                 }
 
@@ -530,6 +536,7 @@ namespace mLab {
     void write_to_file(std::ofstream *_ofstr, _mContainer*_c, int ignore_type) {
         std::string out_str = "";
         if(_c->ignore != -1) ignore_type = _c->ignore;
+        sort(_c);
         if(_c->start) {
             for (text *i = _c->start; ; i = i->next) {
                 if(ignore_type != 0 && (txt_type)ignore_type == i->type) {
@@ -538,13 +545,13 @@ namespace mLab {
                 }
                 switch(i->type) {
                     case txt_type::REPLACEMENT:
-                        out_str += info_string(&i->r);
+                        out_str += info_string(&i->u.r);
                         break;
                     case txt_type::CYCLE:
-                        out_str += info_string(&i->c);
+                        out_str += info_string(&i->u.c);
                         break;
                     case txt_type::DIGIT_REPL:
-                        out_str += info_string(&i->d);
+                        out_str += info_string(&i->u.d);
                         break;
                 }
                 out_str += "----------------\n";
@@ -571,7 +578,7 @@ namespace mLab {
             if(i == _node) {
                 prev->next = i->next;
                 if(i->type == txt_type::REPLACEMENT) {
-                    if(i->r.mapping) delete[] i->r.mapping;
+                    if(i->u.r.mapping) delete[] i->u.r.mapping;
                 }
                 delete i;
                 return true;
@@ -595,6 +602,67 @@ namespace mLab {
 
     void mLab::Init(_mContainer *_c) {
         _c->end = _c->start = NULL;
+    }
+
+    int counter_function(txt_replacement *_t) {
+        return _t->open_txt->length();
+    }
+
+
+    int counter_function(txt_cycle *_t) {
+        return _t->open_txt->length();
+    }
+
+    bool comparat(text *_f, text *_s) {
+        int l1 = 0, l2 = 0;
+        switch (_f->type) {
+            case txt_type::CYCLE:
+                l1 = counter_function(&_f->u.c);
+                break;
+            case txt_type::REPLACEMENT:
+                l1 = counter_function(&_f->u.r);
+                break;
+            case txt_type::DIGIT_REPL:
+                l1 = counter_function(&_f->u.d);
+            default:
+                break;
+        }
+
+        switch (_s->type) {
+            case txt_type::CYCLE:
+                l2 = counter_function(&_s->u.c);
+                break;
+            case txt_type::REPLACEMENT:
+                l2 = counter_function(&_s->u.r);
+                break;
+            case txt_type::DIGIT_REPL:
+                l2 = counter_function(&_s->u.d);
+            default:
+                break;
+        }
+        if(l1 > l2)
+            std::cout << l1 << ">" << l2 << std::endl;
+        else std::cout << l1 << "<=" << l2 << std::endl;
+        return l1 > l2;
+    }
+
+    void sort(_mContainer *cont) {
+        for(text* i = cont->start; i != cont->end; i = i->next) {
+            for(text* j = i->next; j != cont->start; j = j->next) {
+                if(comparat(i, j)) {
+                    auto q = i->u;
+                    i->u = j->u;
+                    j->u = q;
+                    txt_type w = i->type;
+                    i->type = j->type;
+                    j->type = w;
+                }
+            }
+        }
+    }
+
+    int mLab::counter_function(txt_digit_repl *_t) {
+        return _t->open_txt->length();
     }
 
 }

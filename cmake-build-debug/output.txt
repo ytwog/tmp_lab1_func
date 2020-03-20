@@ -1,12 +1,13 @@
-Cipher type: digit replacement
+Cipher type: symbol cycle
 Open_text:
-TExt DSADDASDDDDDDDDDDDD
-Replace:
-A,B,D,E,G,T,e,t,n,1,g
-With:
-13,2,43,101,32,44,35,66,1,0,11
+TExt For
+Shift: 3
 Cipher text:
-44 101 120 66 32 43 83 13 43 43 13 83 43 43 43 43 43 43 43 43 43 43 43 43 
+WHaw Iru
+Owner info:
+some owner
+OpenText length:
+8
 ----------------
 Cipher type: symbol cycle
 Open_text:
@@ -16,13 +17,18 @@ Cipher text:
 WHaw Iru Whvw1qJ
 Owner info:
 some owner
+OpenText length:
+16
 ----------------
-Cipher type: symbol cycle
+Cipher type: digit replacement
 Open_text:
-TExt For
-Shift: 3
+TExt DSADDASDDDDDDDDDDDD
+Replace:
+A,B,D,E,G,T,e,t,n,1,g
+With:
+13,2,43,101,32,44,35,66,1,0,11
 Cipher text:
-WHaw Iru
-Owner info:
-some owner
+44 101 120 66 32 43 83 13 43 43 13 83 43 43 43 43 43 43 43 43 43 43 43 43 
+OpenText length:
+24
 ----------------
