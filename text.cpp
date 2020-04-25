@@ -535,7 +535,8 @@ namespace mLab {
 
     void write_to_file(std::ofstream *_ofstr, _mContainer*_c, int ignore_type) {
         std::string out_str = "";
-        if(_c->ignore != -1) ignore_type = _c->ignore;
+        if(ignore_type != -1) ignore_type = _c->ignore;
+        else ignore_type = 0;
         sort(_c);
         if(_c->start) {
             for (text *i = _c->start; ; i = i->next) {
@@ -663,6 +664,17 @@ namespace mLab {
 
     int mLab::counter_function(txt_digit_repl *_t) {
         return _t->open_txt->length();
+    }
+
+    int mLab::counter_function(text *t) {
+        switch (t->type) {
+            case txt_type::CYCLE:
+                return counter_function((txt_cycle*)t);
+            case txt_type::REPLACEMENT:
+                return counter_function((txt_replacement*)t);
+            case txt_type::DIGIT_REPL:
+                return counter_function((txt_digit_repl*)t);
+        }
     }
 
 }

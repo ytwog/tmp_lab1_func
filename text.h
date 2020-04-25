@@ -34,6 +34,7 @@ namespace mLab {
     void cipher(txt_cycle*);
     void cipher(txt_digit_repl*);
 
+    int counter_function(text*);
     int counter_function(txt_replacement*);
     int counter_function(txt_cycle*);
     int counter_function(txt_digit_repl*);
@@ -53,7 +54,7 @@ namespace mLab {
     void Init(txt_digit_repl*);
     void Init(_mContainer*);
 
-    void write_to_file(std::ofstream *_ofstr, _mContainer *, int ignore_type = 0);
+    void write_to_file(std::ofstream *_ofstr, _mContainer *, int ignore_type = -1);
     int read_from_file(std::ifstream *_ifstr, _mContainer *);
 
     text *text_at(int pos, _mContainer *);
