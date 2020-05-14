@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
         Init(&container);
         print_err(read_from_file(&ifstr, &container));
         write_to_file(&ofstr, &container);
+        multi_method(container, ofstr);
         return 0;
     }
 }

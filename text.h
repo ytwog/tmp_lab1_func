@@ -107,5 +107,6 @@ namespace mLab {
 
     void sort(_mContainer* cont);
 
+    void multi_method(_mContainer &c, std::ofstream &ofstr);
 }
 #endif //LAB1_TEXT_H
