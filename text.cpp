@@ -388,4 +388,44 @@ namespace mLab {
         _c->end = _c->start = NULL;
     }
 
+
+    void multi_method(_mContainer &c, std::ofstream &ofstr) {
+        ofstr << "Multimethod." << std::endl;
+        for(text* i = c.start; i != c.end; i = i->next) {
+            for(text* j = i->next; j != c.start; j = j->next) {
+                std::string str1, str2;
+                switch(i->type) {
+                    // REPLACEMENT
+                    case REPLACEMENT:
+                        switch(j->type) {
+                            case REPLACEMENT:
+                                ofstr << "Replacement and replacement";
+                                str2 = info_string((txt_replacement*)j);
+                                break;
+                            case CYCLE:
+                                ofstr << "Replacement and cycle";
+                                str2 = info_string((txt_cycle*)j);
+                                break;
+                        }
+                        break;
+                        // CYCLE
+                    case CYCLE:
+                        str1 = info_string((txt_cycle*)i);
+                        switch(j->type) {
+                            case REPLACEMENT:
+                                ofstr << "Cycle and replacement";
+                                str2 = info_string((txt_replacement*)j);
+                                break;
+                            case CYCLE:
+                                ofstr << "Cycle and cycle";
+                                str2 = info_string((txt_cycle*)j);
+                                break;
+                        }
+                        break;
+                }
+                ofstr << std::endl;
+                ofstr << str1 << str2;
+            }
+        }
+    }
 }
