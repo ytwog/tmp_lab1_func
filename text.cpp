@@ -41,7 +41,7 @@ namespace mLab {
                 out_str += "5 - waited \">type\", got other str";
                 break;
             case 6:
-                out_str += "6 - type should by either 1 or 2";
+                out_str += "6 - type should by either 1 / 2 / 3";
                 break;
             case 7:
                 out_str += "7 - input/output file can't be opened";
@@ -219,7 +219,10 @@ namespace mLab {
                     step++;
                     break;
                 case 2:
-                    if (str.substr(0, 7) != ">shift ") error_code = 10;
+                  if (str.substr(0, 7) != ">shift ") {
+                    error_code = 10;
+                    break;
+                  }
                     _shift = from_str_to_int(str.substr(7));
                     if(_shift == -1) return 11;
                     if(_shift == -2) return 12;
